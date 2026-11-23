@@ -23,8 +23,7 @@ jobs:
       - name: Extract project
         run: |
           mkdir source
-          unzip -q most_app_android_build_ready.zip -d source
-
+          unzip -q most_app_mvp.zip -d source
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:

@@ -1,0 +1,51 @@
+
+name: Build MOST Android APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Extract project
+        run: |
+          mkdir source
+          unzip -q most_app_android_build_ready.zip -d source
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Generate Android files
+        working-directory: source/most_app
+        run: flutter create . --platforms=android --org com.mostenglish
+
+      - name: Get dependencies
+        working-directory: source/most_app
+        run: flutter pub get
+
+      - name: Build APK
+        working-directory: source/most_app
+        run: flutter build apk --release
+
+      - name: Save APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MOST-Android-APK
+          path: source/most_app/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 14
